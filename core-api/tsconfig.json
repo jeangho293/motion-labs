@@ -20,7 +20,8 @@
     // NOTE: Custom paths
     "baseUrl": "src",
     "paths": {
-      "@configs": ["configs"]
+      "@configs": ["configs"],
+      "@libs/*": ["libs/*"]
     }
   }
 }
