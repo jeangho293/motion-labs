@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PatientsRepository } from '../infrastructure/patients.repository';
 import { FileService } from '@libs/file';
 import { ValidatePatientsService } from './validate-patients.service';
-import { PatientExcelColumn } from '../domain/patients.entity';
+import { Patient, PatientExcelColumn } from '../domain/patients.entity';
+import { Paginated } from '../../../libs/pagination';
 
 @Injectable()
 export class PatientsService {
@@ -19,13 +20,13 @@ export class PatientsService {
   async list(
     { chart, name, phone }: { chart?: string; name?: string; phone?: string },
     { page, limit }: { page?: number; limit?: number }
-  ) {
+  ): Promise<Paginated<Patient[]>> {
     const [patients, total] = await Promise.all([
       this.patientsRepository.find({ chart, name, phone }, { page, limit }),
       this.patientsRepository.count({ chart, name, phone }),
     ]);
 
-    return { patients, total };
+    return { data: patients, total };
   }
 
   /**
@@ -36,6 +37,10 @@ export class PatientsService {
 
     const formattedPatients = this.validatePatientsService.validate(parsedPatients);
 
-    return { totalRows: 1, processedRows: 1, skippedRows: 1 };
+    return {
+      totalRows: parsedPatients.length,
+      processedRows: formattedPatients.length,
+      skippedRows: parsedPatients.length - formattedPatients.length,
+    };
   }
 }

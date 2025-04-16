@@ -4,6 +4,12 @@ export interface FindManyOptions {
   limit?: number;
 }
 
+export type Paginated<TData> = {
+  data: TData;
+
+  total: number;
+};
+
 export const convertOptions = (options?: FindManyOptions) => {
   let skip;
   let take;

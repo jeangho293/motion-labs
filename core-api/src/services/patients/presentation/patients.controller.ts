@@ -13,12 +13,12 @@ export class PatientsController {
   async get(@Query() query: PatientQueryDto) {
     const { chart, name, phone, limit, page } = query;
 
-    const { total, patients } = await this.patientsService.list(
+    const { total, data } = await this.patientsService.list(
       { chart, name, phone },
       { limit, page }
     );
 
-    return { total, page, count: limit, data: patients };
+    return { total, page, count: limit, data };
   }
 
   @Post('/upload')
@@ -28,6 +28,6 @@ export class PatientsController {
     const { buffer } = file;
 
     const data = await this.patientsService.upload(buffer);
-    return { data };
+    return data;
   }
 }
