@@ -41,7 +41,7 @@ export class Patient {
   @Column()
   memo!: string;
 
-  private constructor(args: Creator) {
+  constructor(args: Creator) {
     if (args) {
       this.chart = args.chart;
       this.name = args.name;
