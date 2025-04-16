@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConfigsService {
@@ -15,6 +16,21 @@ export class ConfigsService {
     };
 
     this.checkUndefinedValue(config, 'server');
+    return config;
+  }
+
+  get mysql() {
+    const config: TypeOrmModuleOptions = {
+      type: 'mysql',
+      host: this.configService.get<string>('MYSQL_HOST'),
+      username: this.configService.get<string>('MYSQL_USERNAME'),
+      password: this.configService.get<string>('MYSQL_PASSWORD'),
+      database: this.configService.get<string>('MYSQL_DATABASE'),
+      synchronize: true,
+      port: 3306,
+    };
+
+    this.checkUndefinedValue(config, 'mysql');
     return config;
   }
 
