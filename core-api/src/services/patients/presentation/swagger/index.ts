@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { FileUploadDto } from './dto';
+import { FileUploadDto } from '../dto';
 
 export function ApiFindPatients() {
   return applyDecorators(

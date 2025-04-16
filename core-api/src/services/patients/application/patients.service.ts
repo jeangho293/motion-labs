@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { PatientsRepository } from './patients.repository';
+import { PatientsRepository } from '../infrastructure/patients.repository';
+import { FileService } from '@libs/file';
+import { ValidatePatientsService } from './validate-patients.service';
+import { PatientExcelColumn } from '../domain/patients.entity';
 
 @Injectable()
 export class PatientsService {
-  constructor(private readonly patientsRepository: PatientsRepository) {}
+  constructor(
+    private readonly patientsRepository: PatientsRepository,
+    private readonly fileService: FileService,
+    private readonly validatePatientsService: ValidatePatientsService
+  ) {}
 
   /**
    *
@@ -25,6 +32,10 @@ export class PatientsService {
    * @description 파일 업로드를 통한 환자 등록 및 수정 API
    */
   async upload(buffer: Buffer) {
+    const parsedPatients = this.fileService.parse<PatientExcelColumn>(buffer);
+
+    const formattedPatients = this.validatePatientsService.validate(parsedPatients);
+
     return { totalRows: 1, processedRows: 1, skippedRows: 1 };
   }
 }

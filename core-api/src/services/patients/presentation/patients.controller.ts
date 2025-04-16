@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { PatientsService } from './patients.service';
+import { PatientsService } from '../application/patients.service';
 import { PatientQueryDto } from './dto';
-import { ApiFindPatients, ApiUploadPatients } from './patients-swagger.decorator';
+import { ApiFindPatients, ApiUploadPatients } from './swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/patients')
