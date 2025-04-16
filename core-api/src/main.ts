@@ -14,5 +14,6 @@ import { SwaggerService } from '@libs/swagger';
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   swaggerService.start(app);
+
   await app.listen(port, () => console.log(`server is running on ${port}.`));
 })();
