@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { PatientsService } from './patients.service';
 import { PatientQueryDto } from './dto';
-import { ApiFindPatients } from './patients-swagger.decorator';
+import { ApiFindPatients, ApiUploadPatients } from './patients-swagger.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/patients')
 export class PatientsController {
@@ -21,5 +22,12 @@ export class PatientsController {
   }
 
   @Post('/upload')
-  async upload() {}
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiUploadPatients()
+  async upload(@UploadedFile() file: Express.Multer.File) {
+    const { buffer } = file;
+
+    const data = await this.patientsService.upload(buffer);
+    return { data };
+  }
 }

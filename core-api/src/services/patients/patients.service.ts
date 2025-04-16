@@ -20,4 +20,11 @@ export class PatientsService {
 
     return { patients, total };
   }
+
+  /**
+   * @description 파일 업로드를 통한 환자 등록 및 수정 API
+   */
+  async upload(buffer: Buffer) {
+    return { totalRows: 1, processedRows: 1, skippedRows: 1 };
+  }
 }

@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { FileUploadDto } from './dto';
 
 export function ApiFindPatients() {
   return applyDecorators(
@@ -10,7 +11,7 @@ export function ApiFindPatients() {
       example: {
         total: 50000,
         page: 1,
-        count: 20,
+        count: 1,
         data: [
           {
             id: 1,
@@ -22,6 +23,26 @@ export function ApiFindPatients() {
             memo: '3.7 방문함',
           },
         ],
+      },
+    })
+  );
+}
+
+export function ApiUploadPatients() {
+  return applyDecorators(
+    ApiOperation({ summary: 'excel에 의한 환자 업로드' }),
+    ApiConsumes('multipart/form-data'),
+    ApiBody({
+      description: '환자 excel 파일',
+      type: FileUploadDto,
+    }),
+    ApiResponse({
+      status: 201,
+      description: '응답 예시',
+      example: {
+        totalRows: 50000,
+        processedRows: 49800,
+        skippedRows: 200,
       },
     })
   );
