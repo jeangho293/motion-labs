@@ -5,8 +5,19 @@ import { PatientsRepository } from './patients.repository';
 export class PatientsService {
   constructor(private readonly patientsRepository: PatientsRepository) {}
 
-  async list() {
-    const data = await this.patientsRepository.find({});
-    return data;
+  /**
+   *
+   * @description 환자 목록 조회 API
+   */
+  async list(
+    { chart, name, phone }: { chart?: string; name?: string; phone?: string },
+    { page, limit }: { page?: number; limit?: number }
+  ) {
+    const [patients, total] = await Promise.all([
+      this.patientsRepository.find({ chart, name, phone }, { page, limit }),
+      this.patientsRepository.count({ chart, name, phone }),
+    ]);
+
+    return { patients, total };
   }
 }
