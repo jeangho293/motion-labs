@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigsService } from '@configs';
 import { DataSource } from 'typeorm';
+import entities from './entities';
 
 @Module({
   imports: [
@@ -9,6 +10,7 @@ import { DataSource } from 'typeorm';
       inject: [ConfigsService],
       useFactory: (configsService: ConfigsService) => ({
         ...configsService.mysql,
+        entities,
       }),
     }),
   ],
