@@ -31,6 +31,88 @@ describe('ValidateService 테스트', () => {
     });
   });
 
+  describe('mergeDuplicatedPatient 메서드 테스트', () => {
+    const patients = [
+      {
+        chart: 'C_1001',
+        name: '김환자1',
+        phone: '00000000000',
+        rrn: '010101-1',
+        address: '서울특별시 성동구',
+        memo: '3.6 방문',
+      },
+      {
+        chart: '',
+        name: '김환자1',
+        phone: '00000000000',
+        rrn: '010101-1',
+        address: '',
+        memo: '3.7 방문',
+      },
+      {
+        chart: 'C_1002',
+        name: '김환자1',
+        phone: '00000000000',
+        rrn: '010101-1',
+        address: '서울특별시 성동구',
+        memo: '노쇼',
+      },
+      {
+        chart: '',
+        name: '김환자1',
+        phone: '00000000000',
+        rrn: '010101-2',
+        address: '',
+        memo: '3.7 방문',
+      },
+      {
+        chart: 'C_1002',
+        name: '김환자1',
+        phone: '00000000000',
+        rrn: '010101-1',
+        address: '서울특별시 강동구',
+        memo: '',
+      },
+      {
+        chart: '',
+        name: '김환자2',
+        phone: '00000000000',
+        rrn: '010101-1',
+        address: '',
+        memo: '',
+      },
+    ];
+
+    it('중복된 Patient에 대해서 병합작업을 한다.', () => {
+      expect(validatePatientsService.mergeDuplicatedPatient(patients)).toEqual([
+        {
+          chart: 'C_1001',
+          name: '김환자1',
+          phone: '00000000000',
+          rrn: '010101-1',
+          address: '서울특별시 성동구',
+          memo: '3.7 방문',
+        },
+        {
+          chart: 'C_1002',
+          name: '김환자1',
+          phone: '00000000000',
+          rrn: '010101-1',
+          address: '서울특별시 강동구',
+          memo: '3.7 방문',
+        },
+        {
+          chart: '',
+          name: '김환자2',
+          phone: '00000000000',
+          rrn: '010101-1',
+          address: '',
+          memo: '',
+        },
+      ]);
+    });
+  });
+
   describe('normalizeIdentificationNumber 메서드 테스트', () => {
     it('900101은 900101-0으로 반환된다.', () => {
       expect(validatePatientsService.normalizeIdentificationNumber('900101')).toBe('900101-0');
@@ -62,6 +144,25 @@ describe('ValidateService 테스트', () => {
 
     it('숫자 이외의 문자열이 포함되어있다면 빈 문자열을 반환된다.', () => {
       expect(validatePatientsService.normalizeIdentificationNumber('900bcd-1')).toBe('');
+    });
+  });
+
+  describe('stripEmpty 메서드 테스트', () => {
+    it('해당 객체의 값이 빈 문자열이면 해당 키를 제거한다.', () => {
+      const patient = {
+        chart: '',
+        name: '김환자1',
+        phone: '00011112222',
+        rrn: '',
+        address: '서울시 성동구',
+        memo: '',
+      };
+
+      expect(validatePatientsService.stripEmpty(patient)).toEqual({
+        name: '김환자1',
+        phone: '00011112222',
+        address: '서울시 성동구',
+      });
     });
   });
 });

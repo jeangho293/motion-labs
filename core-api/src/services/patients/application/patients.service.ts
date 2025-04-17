@@ -3,7 +3,7 @@ import { PatientsRepository } from '../infrastructure/patients.repository';
 import { FileService } from '@libs/file';
 import { ValidatePatientsService } from './validate-patients.service';
 import { Patient, PatientExcelColumn } from '../domain/patients.entity';
-import { Paginated } from '../../../libs/pagination';
+import { Paginated } from '@libs/pagination';
 
 @Injectable()
 export class PatientsService {

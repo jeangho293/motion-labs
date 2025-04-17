@@ -1,6 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PatientExcelColumn } from '../domain/patients.entity';
 
+type RawPatient = {
+  chart: string;
+  name: string;
+  phone: string;
+  rrn: string;
+  address: string;
+  memo: string;
+};
+
 @Injectable()
 export class ValidatePatientsService {
   validate(patients: PatientExcelColumn[]) {
@@ -74,6 +83,59 @@ export class ValidatePatientsService {
     return result;
   }
 
+  mergeDuplicatedPatient(patients: RawPatient[]) {
+    const result: RawPatient[] = [];
+    const patientsWithChart = new Map<string, Map<string, RawPatient>>();
+    const patientWithNoChart = new Map<string, RawPatient>();
+
+    patients.forEach((patient) => {
+      const uniqueKey = patient.name + patient.phone;
+      const hasChart = !!patient.chart;
+
+      if (hasChart) {
+        const a = patientsWithChart.get(uniqueKey);
+
+        if (a) {
+          const b = a.get(patient.chart);
+          if (b) {
+            a.set(patient.chart, Object.assign(b, this.stripEmpty(patient)));
+          } else {
+            a.set(patient.chart, patient);
+          }
+        } else {
+          patientsWithChart.set(uniqueKey, new Map().set(patient.chart, patient));
+        }
+      } else {
+        const a = patientWithNoChart.get(uniqueKey);
+        if (a) {
+          patientWithNoChart.set(uniqueKey, Object.assign(a, this.stripEmpty(patient)));
+        } else {
+          const b = patientsWithChart.get(uniqueKey);
+
+          if (b) {
+            const lastEntry = Array.from(b.entries()).at(-1);
+            if (lastEntry) {
+              const [key, value] = lastEntry;
+              b.set(key, Object.assign(value, this.stripEmpty(patient)));
+            }
+          } else {
+            patientWithNoChart.set(uniqueKey, patient);
+          }
+        }
+      }
+    });
+
+    patientsWithChart.forEach((innerMap) => {
+      innerMap.forEach((patient) => {
+        result.push({ ...patient });
+      });
+    });
+
+    result.push(...Array.from(patientWithNoChart.values()));
+
+    return result;
+  }
+
   normalizeIdentificationNumber(input: string) {
     // 하이픈 제거
     const noDash = input.replace(/-/g, '');
@@ -94,5 +156,16 @@ export class ValidatePatientsService {
     }
 
     return '';
+  }
+
+  stripEmpty(patient: RawPatient) {
+    const formattedPatient = Object.keys(patient).reduce((acc, key) => {
+      if (patient[key] !== '') {
+        acc[key] = patient[key];
+      }
+      return acc;
+    }, {} as RawPatient);
+
+    return formattedPatient;
   }
 }
