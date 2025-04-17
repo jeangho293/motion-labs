@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PatientExcelColumn } from '../domain/patients.entity';
+import { merge } from 'lodash';
 
 type RawPatient = {
   chart: string;
@@ -83,6 +84,11 @@ export class ValidatePatientsService {
     return result;
   }
 
+  /**
+   *
+   * @param patients
+   * @description 중복된 환자들에 대해서 데이터 검증 정책에 유효하게 병합작업을 실행한다.
+   */
   mergeDuplicatedPatient(patients: RawPatient[]) {
     const result: RawPatient[] = [];
     const patientsWithChart = new Map<string, Map<string, RawPatient>>();
@@ -91,32 +97,38 @@ export class ValidatePatientsService {
     patients.forEach((patient) => {
       const uniqueKey = patient.name + patient.phone;
       const hasChart = !!patient.chart;
+      const stripedPatient = this.stripEmpty(patient);
 
       if (hasChart) {
-        const a = patientsWithChart.get(uniqueKey);
+        let innerMap = patientsWithChart.get(uniqueKey);
 
-        if (a) {
-          const b = a.get(patient.chart);
-          if (b) {
-            a.set(patient.chart, Object.assign(b, this.stripEmpty(patient)));
-          } else {
-            a.set(patient.chart, patient);
-          }
+        if (!innerMap) {
+          innerMap = new Map();
+          patientsWithChart.set(uniqueKey, innerMap);
+        }
+
+        const existingPatient = innerMap.get(patient.chart);
+        if (existingPatient) {
+          innerMap.set(patient.chart, { ...existingPatient, ...stripedPatient });
         } else {
-          patientsWithChart.set(uniqueKey, new Map().set(patient.chart, patient));
+          innerMap.set(patient.chart, patient);
         }
       } else {
-        const a = patientWithNoChart.get(uniqueKey);
-        if (a) {
-          patientWithNoChart.set(uniqueKey, Object.assign(a, this.stripEmpty(patient)));
-        } else {
-          const b = patientsWithChart.get(uniqueKey);
+        const existingPatient = patientWithNoChart.get(uniqueKey);
 
-          if (b) {
-            const lastEntry = Array.from(b.entries()).at(-1);
+        if (existingPatient) {
+          patientWithNoChart.set(uniqueKey, { ...existingPatient, ...stripedPatient });
+        } else {
+          const innerMap = patientsWithChart.get(uniqueKey);
+
+          if (innerMap) {
+            // NOTE: Map 객체를 사용하여 순서 보장이 되어있음.
+            const lastEntry = Array.from(innerMap.entries()).at(-1);
             if (lastEntry) {
-              const [key, value] = lastEntry;
-              b.set(key, Object.assign(value, this.stripEmpty(patient)));
+              const [lastKey, lastPatient] = lastEntry;
+              innerMap.set(lastKey, { ...lastPatient, ...stripedPatient });
+            } else {
+              patientWithNoChart.set(uniqueKey, patient);
             }
           } else {
             patientWithNoChart.set(uniqueKey, patient);
@@ -126,12 +138,9 @@ export class ValidatePatientsService {
     });
 
     patientsWithChart.forEach((innerMap) => {
-      innerMap.forEach((patient) => {
-        result.push({ ...patient });
-      });
+      innerMap.forEach((patient) => result.push({ ...patient }));
     });
-
-    result.push(...Array.from(patientWithNoChart.values()));
+    result.push(...patientWithNoChart.values());
 
     return result;
   }

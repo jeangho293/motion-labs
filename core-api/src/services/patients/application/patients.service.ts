@@ -34,13 +34,13 @@ export class PatientsService {
    */
   async upload(buffer: Buffer) {
     const parsedPatients = this.fileService.parse<PatientExcelColumn>(buffer);
-
     const formattedPatients = this.validatePatientsService.validate(parsedPatients);
+    const mergedPatients = this.validatePatientsService.mergeDuplicatedPatient(formattedPatients);
 
     return {
       totalRows: parsedPatients.length,
-      processedRows: formattedPatients.length,
-      skippedRows: parsedPatients.length - formattedPatients.length,
+      processedRows: mergedPatients.length,
+      skippedRows: parsedPatients.length - mergedPatients.length,
     };
   }
 }
