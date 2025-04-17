@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DddRepository } from '@libs/ddd';
-import { Patient } from './patients.entity';
+import { Patient } from '../domain/patients.entity';
 import { convertOptions, FindManyOptions } from '@libs/pagination';
 
 @Injectable()
