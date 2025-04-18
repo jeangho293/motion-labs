@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Index } from 'typeorm';
 
 export type Creator = {
   chart: string;
@@ -19,6 +19,7 @@ export type PatientExcelColumn = {
 };
 
 @Entity()
+@Index('idx_name_phone', ['name', 'phone']) // name, phone 대한 인덱스
 export class Patient {
   @PrimaryGeneratedColumn()
   id!: number;
