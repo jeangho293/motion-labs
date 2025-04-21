@@ -24,6 +24,10 @@ docker compose up --build
 
 core-api 경로에서 `npm run start:dev` 를 실행한다.
 
+- Swagger 경로
+
+`http://localhost:3000/api`
+
 - 실행 결과
 
 > 업로드
