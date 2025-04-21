@@ -32,7 +32,7 @@ export class PatientsRepository extends DddRepository<Patient> {
     });
   }
 
-  async save(patients: Patient[]) {
+  async upload(patients: Patient[]) {
     return this.entityManager.transaction(async (transactionEntityManager) => {
       const queryRunner = transactionEntityManager.queryRunner!;
 
@@ -101,6 +101,7 @@ export class PatientsRepository extends DddRepository<Patient> {
         WHERE p.id IS NULL AND t.chart != ''
       `)) as ResultSetHeader;
 
+      // step 6. name + phone이 새로운 레코드면 insert 한다.
       const { affectedRows: stepResult5 } = (await queryRunner.query(`
         INSERT INTO patient (chart, name, phone, rrn, address, memo)
           SELECT t.chart, t.name, t.phone, t.rrn, t.address, t.memo

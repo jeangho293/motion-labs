@@ -37,7 +37,7 @@ export class PatientsService {
     const formattedPatients = this.validatePatientsService.validate(parsedPatients);
     const mergedPatients = this.validatePatientsService.mergeDuplicatedPatient(formattedPatients);
 
-    const { processedRows } = await this.patientsRepository.save(
+    const { processedRows } = await this.patientsRepository.upload(
       mergedPatients.map((patient) => new Patient(patient))
     );
 
