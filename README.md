@@ -1,4 +1,4 @@
-실행 방법
+- 실행 방법
 
 > 1. Docker compose 실행
 
@@ -23,3 +23,13 @@ docker compose up --build
 > 3. 어플리케이션 실행
 
 core-api 경로에서 `npm run start:dev` 를 실행한다.
+
+- 실행 결과
+
+> 업로드
+
+![alt text](image.png)
+
+> 리스트 조회
+
+![alt text](image-1.png)
