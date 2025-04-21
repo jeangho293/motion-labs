@@ -36,7 +36,7 @@ export class PatientsRepository extends DddRepository<Patient> {
       const queryRunner = transactionEntityManager.queryRunner!;
 
       await queryRunner.query(`
-        CREATE TEMPORARY TABLE temp_patient_import (
+        CREATE TEMPORARY TABLE temp_patient (
           chart VARCHAR(255),
           name VARCHAR(255),
           phone VARCHAR(255),
@@ -49,7 +49,7 @@ export class PatientsRepository extends DddRepository<Patient> {
       await transactionEntityManager
         .createQueryBuilder()
         .insert()
-        .into('temp_patient_import')
+        .into('temp_patient')
         .values(patients)
         .execute();
 
@@ -91,7 +91,7 @@ export class PatientsRepository extends DddRepository<Patient> {
 
       // `);
 
-      await queryRunner.query(`DROP TEMPORARY TABLE IF EXISTS temp_patient_import`);
+      await queryRunner.query(`DROP TEMPORARY TABLE IF EXISTS temp_patient`);
     });
   }
 }
