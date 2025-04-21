@@ -11,7 +11,7 @@ import entities from './entities';
       useFactory: (configsService: ConfigsService) => ({
         ...configsService.mysql,
         entities,
-        logging: true,
+        // logging: true,
       }),
     }),
   ],

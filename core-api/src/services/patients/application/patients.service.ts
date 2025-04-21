@@ -37,39 +37,14 @@ export class PatientsService {
     const formattedPatients = this.validatePatientsService.validate(parsedPatients);
     const mergedPatients = this.validatePatientsService.mergeDuplicatedPatient(formattedPatients);
 
-    const temp = [
-      {
-        chart: 'C_1001',
-        name: '김환자1',
-        phone: '01000000000',
-        rrn: '010101-1',
-        address: '서울특별시 성동구',
-        memo: '3.7 방문',
-      },
-      {
-        chart: 'C_1002',
-        name: '김환자1',
-        phone: '01000000000',
-        rrn: '010101-1',
-        address: '서울특별시 강동구',
-        memo: '3.7 방문',
-      },
-      {
-        chart: '',
-        name: '김환자2',
-        phone: '01000000000',
-        rrn: '010101-1',
-        address: '',
-        memo: '',
-      },
-    ];
-    await this.patientsRepository.save(temp.map((patient) => new Patient(patient)));
-    // await this.patientsRepository.save(temp);
+    const { processedRows } = await this.patientsRepository.save(
+      mergedPatients.map((patient) => new Patient(patient))
+    );
 
     return {
       totalRows: parsedPatients.length,
-      processedRows: mergedPatients.length,
-      skippedRows: parsedPatients.length - mergedPatients.length,
+      processedRows,
+      skippedRows: parsedPatients.length - processedRows,
     };
   }
 }
